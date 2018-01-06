@@ -3,12 +3,8 @@ import dj_database_url
 
 RESPONSE_SHARED_SECRET = os.environ.get("RESPONSE_SHARED_SECRET")
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'sr_hxcfy32#fmut4x#x#8&(dc1ipqqq-gl-kww7lrmckztw8nc'
@@ -113,3 +109,9 @@ AUTH_USER_MODEL = 'feedback.FeedbackUser'
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = [
+    os.path.join(PROJECT_ROOT, 'static'),
+]

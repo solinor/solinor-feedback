@@ -57,6 +57,27 @@ def ask_for_feedback(request):
     return render(request, "ask_for_feedback.html", {"users": users})
 
 
+def get_missing_forms(request):
+    if request.GET.get("sharedSecret") != settings.RESPONSE_SHARED_SECRET:
+        return HttpResponseForbidden()
+
+    users = User.objects.filter(active=True)
+    google_forms_list = GoogleForm.objects.filter(active=True).values_list("receiver__email")
+    google_forms = {k[0] for k in google_forms_list}
+    print(google_forms)
+    i = 0
+    print(users)
+    items = []
+    for user in users:
+        print(user)
+        if user.email not in google_forms:
+            items.append([user.email, user.nick_name, user.full_name])
+            i += 1
+        if i > 10:
+            break
+    return HttpResponse(json.dumps(items), content_type="application/json")
+
+
 @csrf_exempt
 def store_forms(request):
     if request.method != "POST":
@@ -68,7 +89,6 @@ def store_forms(request):
         return HttpResponseForbidden()
 
     with transaction.atomic():
-        GoogleForm.objects.all().update(active=False)
         for form in validated_data["items"]:
             if form["type"] == "full":
                 form_type = "F"
@@ -79,6 +99,7 @@ def store_forms(request):
             receiver, created = User.objects.get_or_create(email=form["email"])
             if created:
                 receiver.save()
+            GoogleForm.objects.filter(receiver=receiver, form_type=form_type).update(active=False)
             GoogleForm(form_id=form["id"], form_type=form_type, receiver=receiver, response_url=form["responseUrl"]).save()
     return HttpResponse()
 

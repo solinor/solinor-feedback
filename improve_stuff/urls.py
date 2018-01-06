@@ -11,6 +11,7 @@ urlpatterns = [
     path('', feedback.views.frontpage, name="frontpage"),
     path('ask_for_feedback', feedback.views.ask_for_feedback, name="ask_for_feedback"),
     path('submit_response', feedback.views.record_response),
+    path('get_missing_forms', feedback.views.get_missing_forms),
     path('store_forms', feedback.views.store_forms),
     path('admin/', admin.site.urls),
     url(r'^accounts/', include('googleauth.urls')),

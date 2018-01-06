@@ -1,11 +1,12 @@
-from django.shortcuts import render
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponse
-from django.conf import settings
 import json
-from feedback.models import *
+
 import schema
+from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
+from feedback.models import *
 
 response_schema = schema.Schema({
     "sharedSecret": schema.And(str, len),

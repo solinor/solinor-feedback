@@ -1,4 +1,5 @@
 import os
+
 import dj_database_url
 
 RESPONSE_SHARED_SECRET = os.environ.get("RESPONSE_SHARED_SECRET")

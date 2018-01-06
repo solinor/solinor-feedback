@@ -18,6 +18,7 @@ SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", True) in (True, "Tru
 SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
 CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 ALLOWED_HOSTS = ["*"]
+SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 0))
 
 
 # Application definition
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'googleauth',
     'feedback',
 ]
 
@@ -41,6 +43,34 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# client ID from the Google Developer Console
+GOOGLEAUTH_CLIENT_ID = os.environ["GOOGLEAUTH_CLIENT_ID"]
+
+# client secret from the Google Developer Console
+GOOGLEAUTH_CLIENT_SECRET = os.environ["GOOGLEAUTH_CLIENT_SECRET"]
+
+# your app's domain, used to construct callback URLs
+GOOGLEAUTH_CALLBACK_DOMAIN = os.environ["GOOGLEAUTH_CALLBACK_DOMAIN"]
+
+# callback URL uses HTTPS (your side, not Google), default True
+GOOGLEAUTH_USE_HTTPS = os.environ.get("GOOGLEAUTH_USE_HTTPS", True) in (True, "True", "true")
+
+# restrict to the given Google Apps domain, default None
+GOOGLEAUTH_APPS_DOMAIN = os.environ["GOOGLEAUTH_APPS_DOMAIN"]
+
+# get user's name, default True (extra HTTP request)
+GOOGLEAUTH_GET_PROFILE = True
+
+# sets value of user.is_staff for new users, default False
+GOOGLEAUTH_IS_STAFF = False
+
+# list of default group names to assign to new users
+GOOGLEAUTH_GROUPS = []
+
+AUTHENTICATION_BACKENDS = (
+    'googleauth.backends.GoogleAuthBackend',
+)
 
 ROOT_URLCONF = 'improve_stuff.urls'
 
@@ -107,8 +137,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-AUTH_USER_MODEL = 'feedback.FeedbackUser'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

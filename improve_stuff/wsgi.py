@@ -1,16 +1,9 @@
-"""
-WSGI config for improve_stuff project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/2.0/howto/deployment/wsgi/
-"""
-
 import os
 
-from django.core.wsgi import get_wsgi_application
+from django.core.wsgi import get_wsgi_application  # pylint: disable=wrong-import-position
+from whitenoise.django import DjangoWhiteNoise  # pylint: disable=wrong-import-position
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "improve_stuff.settings")
 
-application = get_wsgi_application()
+application = get_wsgi_application()  # pylint: disable=invalid-name
+application = DjangoWhiteNoise(application)  # pylint: disable=invalid-name

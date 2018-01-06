@@ -5,6 +5,8 @@ from django.views.generic.base import RedirectView
 
 import feedback.views
 
+admin.autodiscover()
+
 urlpatterns = [
     path('', feedback.views.frontpage, name="frontpage"),
     path('ask_for_feedback', feedback.views.ask_for_feedback, name="ask_for_feedback"),

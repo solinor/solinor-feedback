@@ -1,9 +1,11 @@
 import os
+import sys
 
 import dj_database_url
 
 RESPONSE_SHARED_SECRET = os.environ.get("RESPONSE_SHARED_SECRET")
 
+os.environ['PATH'] += os.pathsep + os.path.dirname(sys.executable)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,7 +13,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'sr_hxcfy32#fmut4x#x#8&(dc1ipqqq-gl-kww7lrmckztw8nc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", True) in ("true", "True", "1")
+DEBUG = os.environ.get("DEBUG", True) in (True, "true", "True", "1")
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", True) in (True, "True", "true")
@@ -19,9 +21,39 @@ SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
 CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 ALLOWED_HOSTS = ["*"]
 SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 0))
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
-
-# Application definition
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'verbose',
+            'level': 'DEBUG',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+        'feedback': {
+            'handlers': ['console'],
+            'level': os.getenv('INVOICES_LOG_LEVEL', 'INFO'),
+            'propagate': True,
+        }
+    },
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -135,10 +167,13 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
-
+DATE_FORMAT = "Y-m-d"
+SHORT_DATE_FORMAT = "Y-m-d"
+DATETIME_FORMAT = "Y-m-d H:i"
+SHORT_DATETIME_FORMAT = "Y-m-d H:i"
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 

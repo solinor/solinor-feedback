@@ -1,0 +1,6 @@
+syntax: glob
+
+*.pyc
+dev/
+__pycache__
+db.sqlite3

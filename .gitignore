@@ -4,3 +4,4 @@ syntax: glob
 dev/
 __pycache__
 db.sqlite3
+improve_stuff/staticfiles

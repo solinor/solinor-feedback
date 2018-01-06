@@ -62,14 +62,11 @@ def get_missing_forms(request):
         return HttpResponseForbidden()
 
     users = User.objects.filter(active=True)
-    google_forms_list = GoogleForm.objects.filter(active=True).values_list("receiver__email")
-    google_forms = {k[0] for k in google_forms_list}
-    print(google_forms)
+    google_forms_list = GoogleForm.objects.filter(active=True).values_list("receiver__email", flat=True)
+    google_forms = {k for k in google_forms_list}
     i = 0
-    print(users)
     items = []
     for user in users:
-        print(user)
         if user.email not in google_forms:
             items.append([user.email, user.nick_name, user.full_name])
             i += 1

@@ -8,11 +8,21 @@ class User(models.Model):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=100, null=True)
     last_name = models.CharField(max_length=100, null=True)
+    unique_first_name = models.CharField(max_length=100, null=True)
     active = models.BooleanField(default=True, blank=True)
 
     @property
+    def nick_name(self):
+        if self.unique_first_name:
+            return self.unique_first_name
+        return self.first_name
+
+    @property
     def full_name(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        if self.first_name:
+            return "%s %s" % (self.first_name, self.last_name)
+        else:
+            return self.email
 
     def __str__(self):
         return self.email

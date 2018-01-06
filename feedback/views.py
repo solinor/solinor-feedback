@@ -37,7 +37,24 @@ forms_schema = schema.Schema({
 
 @login_required
 def frontpage(request):
-    return render(request, "frontpage.html", {})
+    user, _ = User.objects.get_or_create(email=request.user.email)
+    all_forms = GoogleForm.objects.all().filter(active=True).exclude(receiver=user)
+    requests = FeedbackRequest.objects.filter(requestee=user)
+    feedback_given = ResponseSet.objects.filter(respondent=user)
+    return render(request, "frontpage.html", {"all_forms": all_forms, "requests": requests, "given": feedback_given})
+
+
+@login_required
+def ask_for_feedback(request):
+    user, _ = User.objects.get_or_create(email=request.user.email)
+    if request.method == "POST":
+        requestee_email = request.POST.get("email")
+        requestee = User.objects.get(email=requestee_email)
+        fbr = FeedbackRequest(requestee=requestee, requester=user)
+        fbr.save()
+        return HttpResponse(json.dumps({"success": True}), content_type="application/json")
+    users = User.objects.filter(active=True).exclude(email=request.user.email)
+    return render(request, "ask_for_feedback.html", {"users": users})
 
 
 @csrf_exempt

@@ -10,6 +10,10 @@ class User(models.Model):
     last_name = models.CharField(max_length=100, null=True)
     active = models.BooleanField(default=True, blank=True)
 
+    @property
+    def full_name(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
     def __str__(self):
         return self.email
 
@@ -17,6 +21,19 @@ class User(models.Model):
 class FeedbackRequest(models.Model):
     requester = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requester")
     requestee = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requestee")
+
+    def active_form(self):
+        forms = GoogleForm.objects.filter(receiver=self.requester).filter(active=True)
+        if len(forms) > 0:
+            return forms[0]
+        return None
+
+    def active_response(self):
+        print(repr(self.requestee))
+        response_set = ResponseSet.objects.filter(respondent=self.requestee).filter(active=True)
+        if len(response_set) > 0:
+            return response_set[0]
+        return None
 
 
 class GoogleForm(models.Model):

@@ -7,6 +7,7 @@ import feedback.views
 
 urlpatterns = [
     path('', feedback.views.frontpage, name="frontpage"),
+    path('ask_for_feedback', feedback.views.ask_for_feedback, name="ask_for_feedback"),
     path('submit_response', feedback.views.record_response),
     path('store_forms', feedback.views.store_forms),
     path('admin/', admin.site.urls),

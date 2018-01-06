@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="jumbotron">
+<h1>Get started</h1>
+
+<p>
+<a href="{% url "ask_for_feedback" %}" class="btn btn-primary btn-lg">Ask for feedback</a>
+
+{% if requests %}
+<a href="#" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.requester.full_name }}</a>
+{% endif %}
+</p>
+</div>
+
+<h1>Feedback requests</h1>
+
+{% if requests %}
+<ul>
+  {% for request in requests %}
+    {% if request.active_response %}
+    {% else %}
+      <li><a href="{{ request.active_form.response_url }}">{{ request.requester.full_name }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ul>
+{% else %}
+<p>You don't have any pending feedback requests.</p>
+{% endif %}
+
+<h1>Feedback you have sent</h1>
+
+{% if given %}
+<ul>
+  {% for feedback in given %}
+  <li>{{ feedback.receiver.full_name }} <a href="{{ feedback.edit_response_url }}"><span class="glyphicon glyphicon-pencil"></span></a></li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>You haven't given any feedback yet.</p>
+{% endif %}
+
+<h1>All active users</h1>
+
+<ul>
+  {% for form in all_forms %}
+  <li><a href="{{ form.response_url }}">{{ form.receiver.full_name }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

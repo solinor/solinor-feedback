@@ -6,13 +6,13 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %}</title>
+    <title>{% block title %}Solinor Feedback{% endblock %}</title>
 
-    <link href="/static/css/base.css" rel="stylesheet">
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{% static 'django_tables2/bootstrap.css' %}" rel="stylesheet" />
+    <link href="{% static "css/base.css" %}" rel="stylesheet">
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "django_tables2/bootstrap.css" %}" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
 
     {% block header %}{% endblock %}
 </head>
@@ -31,12 +31,7 @@
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          {% if request.user.is_authenticated %}
           <li><a href="{% url "frontpage" %}">Home</a></li>
-          <li><a href="{% url "projects_list" %}">Projects</a></li>
-          <li><a href="{% url "people" %}">People</a></li>
-          <li><a href="{% url "hours_list" %}">Hours</a></li>
-          {% endif %}
           {% block navbar_items %}{% endblock %}
         </ul>
         {% if request.user.is_staff %}

@@ -25,6 +25,7 @@ class GoogleForm(models.Model):
         ("B", "Basic"),
     )
     form_id = models.CharField(max_length=500, primary_key=True)
+    response_url = models.URLField(null=True)
     form_type = models.CharField(max_length=1, choices=TYPE)
     receiver = models.ForeignKey("User", on_delete=models.CASCADE)
     active = models.BooleanField(default=True, blank=True)

@@ -29,6 +29,7 @@ forms_schema = schema.Schema({
             "id": schema.And(str, len),
             "email": schema.And(str, len, lambda s: "@" in s),
             "type": schema.And(str, len),
+            "responseUrl": schema.And(str, len),
         }
     ],
 })
@@ -36,7 +37,7 @@ forms_schema = schema.Schema({
 
 @login_required
 def frontpage(request):
-    pass
+    return render(request, "frontpage.html", {})
 
 
 @csrf_exempt
@@ -61,7 +62,7 @@ def store_forms(request):
             receiver, created = User.objects.get_or_create(email=form["email"])
             if created:
                 receiver.save()
-            GoogleForm(form_id=form["id"], form_type=form_type, receiver=receiver).save()
+            GoogleForm(form_id=form["id"], form_type=form_type, receiver=receiver, response_url=form["responseUrl"]).save()
     return HttpResponse()
 
 

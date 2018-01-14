@@ -8,7 +8,7 @@
 <a href="{% url "ask_for_feedback" %}" class="btn btn-primary btn-lg">Ask for feedback</a>
 
 {% if requests %}
-<a href="#" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.requester.full_name }}</a>
+<a href="#" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.receiver.full_name }}</a>
 {% endif %}
 </p>
 </div>
@@ -30,7 +30,7 @@
 {% if given %}
 <ul>
   {% for feedback in given %}
-  <li>{{ feedback.receiver.full_name }} <a href="{{ feedback.edit_response_url }}"><span class="glyphicon glyphicon-pencil"></span></a></li>
+  <li>{{ feedback.receiver.full_name }} <a target="_blank" href="{{ feedback.edit_response_url }}"><span class="glyphicon glyphicon-pencil"></span></a></li>
   {% endfor %}
 </ul>
 {% else %}

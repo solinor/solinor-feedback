@@ -41,7 +41,7 @@ def frontpage(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
     requests = list(FeedbackRequest.objects.filter(giver=user).filter(active_response=None).select_related("giver", "receiver", "requested_by"))
     random.shuffle(requests)
-    feedback_given = ResponseSet.objects.filter(giver=user).select_related("giver", "receiver")
+    feedback_given = ResponseSet.objects.filter(giver=user).filter(active=True).select_related("giver", "receiver")
     existing_users = {k.receiver.email for k in requests}
     existing_users.update({k.receiver.email for k in feedback_given})
     all_forms = list(GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver"))

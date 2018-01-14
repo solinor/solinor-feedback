@@ -140,7 +140,7 @@ def record_response(request):
     gets_stuff_done = int(validated_data["responses"][2]["answer"])
     work_with = validated_data["responses"][3]["answer"]
 
-    respondent, created = User.objects.get_or_create(email=validated_data["respondent"])
+    giver, created = User.objects.get_or_create(email=validated_data["respondent"])
     if created:
         respondent.save()
 
@@ -149,8 +149,8 @@ def record_response(request):
     fb_request = FeedbackRequest.objects.filter(receiver=receiver, giver=giver)
 
     with transaction.atomic():
-        ResponseSet.objects.filter(respondent=respondent).filter(receiver=receiver).update(active=False)
-        response_set = ResponseSet(respondent=respondent,
+        ResponseSet.objects.filter(giver=giver).filter(receiver=receiver).update(active=False)
+        response_set = ResponseSet(giver=giver,
                                    receiver=receiver,
                                    anonymous=anonymous,
                                    fun_to_work_with=fun_to_work_with,

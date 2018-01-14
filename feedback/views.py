@@ -138,6 +138,8 @@ def record_response(request):
     if created:
         respondent.save()
 
+    form_id = validated_data["editUrl"].replace("https://docs.google.com/forms/d/e/", "").split("/")[0]
+    receiver = GoogleForm.objects.get(form_id=form_id).receiver
 
     ResponseSet.objects.filter(respondent=respondent).filter(receiver=receiver).update(active=False)
     response_set = ResponseSet(respondent=respondent,

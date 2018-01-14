@@ -8,7 +8,7 @@
 <a href="{% url "ask_for_feedback" %}" class="btn btn-primary btn-lg">Ask for feedback</a>
 
 {% if requests %}
-<a href="#" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.receiver.full_name }}</a>
+<a target="_blank" href="{{ requests.0.receiver.active_full_form }}" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.receiver.full_name }}</a>
 {% endif %}
 </p>
 </div>

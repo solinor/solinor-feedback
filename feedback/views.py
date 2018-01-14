@@ -85,7 +85,7 @@ def get_forms_for_script(request):
     google_forms_list = list(GoogleForm.objects.filter(active=True).filter(script_id=script_id).values_list("form_id", flat=True))
     with transaction.atomic():
         unassigned_forms = GoogleForm.objects.filter(active=True).filter(script_id=None)
-        for a in range(0, min(len(unassigned_forms), 20 - len(google_forms_list))):
+        for a in range(0, min(len(unassigned_forms), 19 - len(google_forms_list))):
             unassigned_forms[a].script_id = script_id
             unassigned_forms[a].save()
             google_forms_list.append(unassigned_forms[a].form_id)

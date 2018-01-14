@@ -14,6 +14,7 @@ urlpatterns = [
     path('get_missing_forms', feedback.views.get_missing_forms),
     path('store_forms', feedback.views.store_forms),
     path('admin/', admin.site.urls),
+    path('get_script_triggers', feedback.views.get_forms_for_script),
     url(r'^accounts/', include('googleauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(pattern_name='frontpage', permanent=False)),
 ]

@@ -56,6 +56,7 @@ class GoogleForm(models.Model):
     form_type = models.CharField(max_length=1, choices=TYPE)
     receiver = models.ForeignKey("User", on_delete=models.CASCADE)
     active = models.BooleanField(default=True, blank=True)
+    script_id = models.CharField(max_length=500, null=True, blank=True)
 
 
 class Question(models.Model):

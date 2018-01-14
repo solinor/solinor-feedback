@@ -75,6 +75,23 @@ def get_missing_forms(request):
     return HttpResponse(json.dumps(items), content_type="application/json")
 
 
+def get_forms_for_script(request):
+    if request.GET.get("sharedSecret") != settings.RESPONSE_SHARED_SECRET:
+        return HttpResponseForbidden("Invalid shared secret")
+    script_id = request.GET.get("scriptId")
+    if not script_id:
+        return HttpResponseBadRequest("Missing scriptId")
+
+    google_forms_list = list(GoogleForm.objects.filter(active=True).filter(script_id=script_id).values_list("form_id", flat=True))
+    with transaction.atomic():
+        unassigned_forms = GoogleForm.objects.filter(active=True).filter(script_id=None)
+        for a in range(0, min(len(unassigned_forms), 20 - len(google_forms_list))):
+            unassigned_forms[a].script_id = script_id
+            unassigned_forms[a].save()
+            google_forms_list.append(unassigned_forms[a].form_id)
+    return HttpResponse(json.dumps(google_forms_list), content_type="application/json")
+
+
 @csrf_exempt
 def store_forms(request):
     if request.method != "POST":

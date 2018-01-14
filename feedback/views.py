@@ -1,4 +1,5 @@
 import json
+import random
 
 import schema
 from django.conf import settings
@@ -38,10 +39,18 @@ forms_schema = schema.Schema({
 @login_required
 def frontpage(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
-    all_forms = GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver")
-    requests = FeedbackRequest.objects.filter(giver=user).select_related("giver", "receiver", "requested_by")
-    feedback_given = ResponseSet.objects.filter(receiver=user)
-    return render(request, "frontpage.html", {"all_forms": all_forms, "requests": requests, "given": feedback_given})
+    requests = list(FeedbackRequest.objects.filter(giver=user).filter(active_response=None).select_related("giver", "receiver", "requested_by"))
+    random.shuffle(requests)
+    feedback_given = ResponseSet.objects.filter(giver=user).select_related("giver", "receiver")
+    existing_users = {k.receiver.email for k in requests}
+    existing_users.update({k.receiver.email for k in feedback_given})
+    all_forms = list(GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver"))
+    unanswered_forms = []
+    for form in all_forms:
+        if form.receiver.email not in existing_users:
+            unanswered_forms.append(form)
+    random.shuffle(unanswered_forms)
+    return render(request, "frontpage.html", {"all_forms": unanswered_forms, "requests": requests, "given": feedback_given})
 
 
 @login_required

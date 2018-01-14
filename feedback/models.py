@@ -11,6 +11,9 @@ class User(models.Model):
     unique_first_name = models.CharField(max_length=100, null=True)
     active = models.BooleanField(default=True, blank=True)
 
+    active_full_form = models.URLField(null=True, blank=True)
+    active_basic_form = models.URLField(null=True, blank=True)
+
     @property
     def nick_name(self):
         if self.unique_first_name:
@@ -31,15 +34,19 @@ class User(models.Model):
 class FeedbackRequest(models.Model):
     requester = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requester")
     requestee = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requestee")
+    requested_by = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requested_by", null=True)
+
+    class Meta:
+        ordering = ("requester",)
+        unique_together = (("requester", "requestee"))
 
     def active_form(self):
-        forms = GoogleForm.objects.filter(receiver=self.requester).filter(active=True)
+        forms = self.requester.googleform_set.filter(active=True)
         if len(forms) > 0:
             return forms[0]
         return None
 
     def active_response(self):
-        print(repr(self.requestee))
         response_set = ResponseSet.objects.filter(respondent=self.requestee).filter(active=True)
         if len(response_set) > 0:
             return response_set[0]
@@ -57,6 +64,9 @@ class GoogleForm(models.Model):
     receiver = models.ForeignKey("User", on_delete=models.CASCADE)
     active = models.BooleanField(default=True, blank=True)
     script_id = models.CharField(max_length=500, null=True, blank=True)
+
+    class Meta:
+        ordering = ("receiver",)
 
 
 class Question(models.Model):

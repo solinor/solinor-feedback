@@ -38,8 +38,8 @@ forms_schema = schema.Schema({
 @login_required
 def frontpage(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
-    all_forms = GoogleForm.objects.all().filter(active=True).exclude(receiver=user)
-    requests = FeedbackRequest.objects.filter(requestee=user)
+    all_forms = GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver")
+    requests = FeedbackRequest.objects.filter(requestee=user).select_related("requestee", "requester", "requested_by")
     feedback_given = ResponseSet.objects.filter(respondent=user)
     return render(request, "frontpage.html", {"all_forms": all_forms, "requests": requests, "given": feedback_given})
 
@@ -50,7 +50,7 @@ def ask_for_feedback(request):
     if request.method == "POST":
         requestee_email = request.POST.get("email")
         requestee = User.objects.get(email=requestee_email)
-        fbr = FeedbackRequest(requestee=requestee, requester=user)
+        fbr = FeedbackRequest(requestee=requestee, requester=user, requested_by=user)
         fbr.save()
         return HttpResponse(json.dumps({"success": True}), content_type="application/json")
     users = User.objects.filter(active=True).exclude(email=request.user.email)
@@ -113,8 +113,15 @@ def store_forms(request):
             receiver, created = User.objects.get_or_create(email=form["email"])
             if created:
                 receiver.save()
+
             GoogleForm.objects.filter(receiver=receiver, form_type=form_type).update(active=False)
             GoogleForm(form_id=form["id"], form_type=form_type, receiver=receiver, response_url=form["responseUrl"]).save()
+            if form_type == "F":
+                receiver.active_full_form = form["responseUrl"]
+            if form_type == "B":
+                receiver.active_basic_form = form["responseUrl"]
+            receiver.save()
+
     return HttpResponse()
 
 

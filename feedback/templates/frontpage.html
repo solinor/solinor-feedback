@@ -17,10 +17,10 @@
 
 {% if requests %}
 <ul>
-  {% for request in requests %}
-    {% if request.active_response %}
+  {% for feedback_request in requests %}
+    {% if feedback_request.active_response %}
     {% else %}
-      <li><a href="{{ request.active_form.response_url }}">{{ request.requester.full_name }}</a></li>
+      <li><a href="{{ feedback_request.requester.active_full_form }}">{{ feedback_request.requester.full_name }}</a></li>
     {% endif %}
   {% endfor %}
 </ul>
@@ -40,11 +40,17 @@
 <p>You haven't given any feedback yet.</p>
 {% endif %}
 
-<h1>All active users</h1>
+<h1>Everyone else</h1>
+
+{% if all_forms %}
 
 <ul>
   {% for form in all_forms %}
   <li><a href="{{ form.response_url }}">{{ form.receiver.full_name }}</a></li>
   {% endfor %}
 </ul>
+
+{% else %}
+<p>It seems there is no-one to show on this list: everyone on the system are already in your feedback requests and/or "you have already given feedback" lists.</p>
+{% endif %}
 {% endblock %}

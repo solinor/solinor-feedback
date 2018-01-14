@@ -145,8 +145,8 @@ def record_response(request):
         respondent.save()
 
     form_id = validated_data["editUrl"].replace("https://docs.google.com/forms/d/e/", "").split("/")[0]
-    receiver = GoogleForm.objects.get(form_id=form_id).receiver
-    request = FeedbackRequest.objects.filter(receiver=receiver, giver=giver)
+    receiver = GoogleForm.objects.filter(response_url__contains=form_id)[0].receiver
+    fb_request = FeedbackRequest.objects.filter(receiver=receiver, giver=giver)
 
     with transaction.atomic():
         ResponseSet.objects.filter(respondent=respondent).filter(receiver=receiver).update(active=False)
@@ -158,6 +158,7 @@ def record_response(request):
                                    work_with=work_with,
                                    edit_response_url=validated_data["editUrl"])
         response_set.save()
+        fb_request.update(active_response=response_set)
 
         for item in validated_data["responses"][4:]:
             if item["answer"] == "":

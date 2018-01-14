@@ -1,11 +1,33 @@
 {% extends "base.html" %}
 
+{% block header %}
+<script>
+$(function () {
+  $(".request-feedback").each(function() {
+    $(this).click(function () {
+      var parent = $(this);
+      parent.find(".spinner-holder").html('<i class="fa fa-spinner fa-spin fa-fw"></i>');
+      $.post("{% url "ask_for_feedback" %}", {'csrfmiddlewaretoken': '{{ csrf_token }}', "email": $(this).data("email")}, function(data) {
+        if (data.success === true) {
+          parent.removeClass("btn-default").addClass("btn-success").prop("disabled", true);
+          parent.find(".spinner-holder").html('<i class="fa fa-check fa-fw"></i>');
+        } else {
+          parent.removeClass("btn-default").addClass("btn-warning").prop("disabled", true);
+          parent.find(".spinner-holder").html('<i class="fa fa-times fa-fw"></i>');
+        }
+      }, "json");
+    });
+  });
+});
+</script>
+{% endblock %}
 {% block content %}
 <h1>Ask for feedback</h1>
 
-<ul>
-  {% for user in users %}
-  <li>{{ user }} <form method="post" action="{% url "ask_for_feedback" %}">{% csrf_token %}<input type="hidden" name="email" value="{{ user.email }}"><input type="submit" class="btn btn-info"></form></li>
-  {% endfor %}
-</ul>
+<p style="max-width: 30em">
+{% for user in users %}
+<button type="button" class="btn {% if user.fb_request %}btn-disabled btn-success{% else %}btn-default request-feedback{% endif %} btn-lg btn-block" {% if user.fb_request %} disabled="disabled"{% endif %} data-email="{{ user.email }}">{{ user.full_name }} <span class="spinner-holder"></span></button>
+
+{% endfor %}
+</p>
 {% endblock %}

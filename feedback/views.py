@@ -61,7 +61,11 @@ def ask_for_feedback(request):
         fbr = FeedbackRequest(giver=giver, receiver=user, requested_by=user)
         fbr.save()
         return HttpResponse(json.dumps({"success": True}), content_type="application/json")
-    users = User.objects.filter(active=True).exclude(email=request.user.email)
+    users = list(User.objects.filter(active=True).exclude(email=request.user.email))
+    requests = {k.giver.email: k for k in FeedbackRequest.objects.filter(receiver=user)}
+    for user in users:
+        user.fb_request = requests.get(user.email)
+    random.shuffle(users)
     return render(request, "ask_for_feedback.html", {"users": users})
 
 

@@ -39,8 +39,8 @@ forms_schema = schema.Schema({
 def frontpage(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
     all_forms = GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver")
-    requests = FeedbackRequest.objects.filter(requestee=user).select_related("requestee", "requester", "requested_by")
-    feedback_given = ResponseSet.objects.filter(respondent=user)
+    requests = FeedbackRequest.objects.filter(giver=user).select_related("giver", "receiver", "requested_by")
+    feedback_given = ResponseSet.objects.filter(receiver=user)
     return render(request, "frontpage.html", {"all_forms": all_forms, "requests": requests, "given": feedback_given})
 
 
@@ -48,9 +48,8 @@ def frontpage(request):
 def ask_for_feedback(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
     if request.method == "POST":
-        requestee_email = request.POST.get("email")
-        requestee = User.objects.get(email=requestee_email)
-        fbr = FeedbackRequest(requestee=requestee, requester=user, requested_by=user)
+        giver = User.objects.get(email=request.POST.get("email"))
+        fbr = FeedbackRequest(giver=giver, receiver=user, requested_by=user)
         fbr.save()
         return HttpResponse(json.dumps({"success": True}), content_type="application/json")
     users = User.objects.filter(active=True).exclude(email=request.user.email)
@@ -147,22 +146,25 @@ def record_response(request):
 
     form_id = validated_data["editUrl"].replace("https://docs.google.com/forms/d/e/", "").split("/")[0]
     receiver = GoogleForm.objects.get(form_id=form_id).receiver
+    request = FeedbackRequest.objects.filter(receiver=receiver, giver=giver)
 
-    ResponseSet.objects.filter(respondent=respondent).filter(receiver=receiver).update(active=False)
-    response_set = ResponseSet(respondent=respondent,
-                               receiver=receiver,
-                               anonymous=anonymous,
-                               fun_to_work_with=fun_to_work_with,
-                               gets_stuff_done=gets_stuff_done,
-                               work_with=work_with,
-                               edit_response_url=validated_data["editUrl"])
-    response_set.save()
-    for item in validated_data["responses"][4:]:
-        if item["answer"] == "":
-            continue
-        question, created = Question.objects.get_or_create(question=item["question"])
-        if created:
-            question.save()
-        answer = Answer(question=question, responses=response_set, response=item["answer"])
-        answer.save()
+    with transaction.atomic():
+        ResponseSet.objects.filter(respondent=respondent).filter(receiver=receiver).update(active=False)
+        response_set = ResponseSet(respondent=respondent,
+                                   receiver=receiver,
+                                   anonymous=anonymous,
+                                   fun_to_work_with=fun_to_work_with,
+                                   gets_stuff_done=gets_stuff_done,
+                                   work_with=work_with,
+                                   edit_response_url=validated_data["editUrl"])
+        response_set.save()
+
+        for item in validated_data["responses"][4:]:
+            if item["answer"] == "":
+                continue
+            question, created = Question.objects.get_or_create(question=item["question"])
+            if created:
+                question.save()
+            answer = Answer(question=question, responses=response_set, response=item["answer"])
+            answer.save()
     return HttpResponse()

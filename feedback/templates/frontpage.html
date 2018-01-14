@@ -18,10 +18,7 @@
 {% if requests %}
 <ul>
   {% for feedback_request in requests %}
-    {% if feedback_request.active_response %}
-    {% else %}
-      <li><a href="{{ feedback_request.requester.active_full_form }}">{{ feedback_request.requester.full_name }}</a></li>
-    {% endif %}
+    <li><a target="_blank" href="{{ feedback_request.receiver.active_full_form }}">{{ feedback_request.receiver.full_name }}</a></li>
   {% endfor %}
 </ul>
 {% else %}

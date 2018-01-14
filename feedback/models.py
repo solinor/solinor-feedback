@@ -32,25 +32,14 @@ class User(models.Model):
 
 
 class FeedbackRequest(models.Model):
-    requester = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requester")
-    requestee = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requestee")
-    requested_by = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requested_by", null=True)
+    receiver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="feedback_receiver")
+    giver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="feedback_giver")
+    requested_by = models.ForeignKey("User", on_delete=models.CASCADE, related_name="requested_by")
+    active_response = models.ForeignKey("ResponseSet", on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        ordering = ("requester",)
-        unique_together = (("requester", "requestee"))
-
-    def active_form(self):
-        forms = self.requester.googleform_set.filter(active=True)
-        if len(forms) > 0:
-            return forms[0]
-        return None
-
-    def active_response(self):
-        response_set = ResponseSet.objects.filter(respondent=self.requestee).filter(active=True)
-        if len(response_set) > 0:
-            return response_set[0]
-        return None
+        ordering = ("receiver",)
+        unique_together = (("receiver", "giver", "requested_by"))
 
 
 class GoogleForm(models.Model):
@@ -83,9 +72,9 @@ class Answer(models.Model):
 
 
 class ResponseSet(models.Model):
-    receiver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="receiver", null=True)
-    respondent = models.ForeignKey("User", on_delete=models.CASCADE, related_name="respondent", null=True)
-    form = models.ForeignKey("GoogleForm", on_delete=models.CASCADE, null=True)
+    receiver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="receiver")
+    giver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="giver")
+    form = models.ForeignKey("GoogleForm", on_delete=models.CASCADE)
     edit_response_url = models.URLField()
     activated = models.BooleanField(default=False, blank=True)
     answered_at = models.DateTimeField(auto_now_add=True)

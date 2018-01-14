@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'googleauth',
     'feedback',
 ]
+if DEBUG:
+    INSTALLED_APPS += ('debug_toolbar',)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -77,6 +79,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+if DEBUG:
+    MIDDLEWARE += ("debug_toolbar.middleware.DebugToolbarMiddleware",)
+    INTERNAL_IPS = ("127.0.0.1",)
 
 # client ID from the Google Developer Console
 GOOGLEAUTH_CLIENT_ID = os.environ["GOOGLEAUTH_CLIENT_ID"]

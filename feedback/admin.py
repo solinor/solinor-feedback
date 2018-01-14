@@ -12,7 +12,7 @@ admin.site.register(User, UserAdmin)
 
 
 class FeedbackRequestAdmin(admin.ModelAdmin):
-    list_display = ("requester", "requestee")
+    list_display = ("receiver", "giver")
 
 
 admin.site.register(FeedbackRequest, FeedbackRequestAdmin)

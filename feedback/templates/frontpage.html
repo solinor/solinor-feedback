@@ -37,6 +37,7 @@
 <p>You haven't given any feedback yet.</p>
 {% endif %}
 
+{% comment %}
 <h1>Everyone else</h1>
 
 {% if all_forms %}
@@ -50,4 +51,5 @@
 {% else %}
 <p>It seems there is no-one to show on this list: everyone on the system are already in your feedback requests and/or "you have already given feedback" lists.</p>
 {% endif %}
+{% endcomment %}
 {% endblock %}

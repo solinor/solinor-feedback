@@ -44,7 +44,7 @@ def frontpage(request):
     feedback_given = ResponseSet.objects.filter(giver=user).filter(active=True).select_related("giver", "receiver")
     existing_users = {k.receiver.email for k in requests}
     existing_users.update({k.receiver.email for k in feedback_given})
-    all_forms = list(GoogleForm.objects.all().filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver"))
+    all_forms = list(GoogleForm.objects.filter(active=True).exclude(receiver=user).filter(form_type="B").select_related("receiver"))
     unanswered_forms = []
     for form in all_forms:
         if form.receiver.email not in existing_users:

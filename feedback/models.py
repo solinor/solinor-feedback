@@ -41,6 +41,10 @@ class FeedbackRequest(models.Model):
         ordering = ("receiver",)
         unique_together = (("receiver", "giver", "requested_by"))
 
+    def __str__(self):
+        answered = self.active_response is not None
+        return "Request by %s for %s; answered: %s" % (self.receiver, self.giver, answered)
+
 
 class GoogleForm(models.Model):
     TYPE = (
@@ -84,3 +88,6 @@ class ResponseSet(models.Model):
     fun_to_work_with = models.PositiveSmallIntegerField()
     gets_stuff_done = models.PositiveSmallIntegerField()
     work_with = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "Response from %s to %s (active: %s)" % (self.giver, self.receiver, self.active)

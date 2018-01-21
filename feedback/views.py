@@ -1,5 +1,6 @@
 import json
 import random
+from collections import defaultdict
 
 import schema
 from django.conf import settings
@@ -74,14 +75,17 @@ def get_missing_forms(request):
         return HttpResponseForbidden()
 
     users = User.objects.filter(active=True)
-    google_forms_list = GoogleForm.objects.filter(active=True).values_list("receiver__email", flat=True)
-    google_forms = {k for k in google_forms_list}
+    google_forms_list = GoogleForm.objects.filter(active=True).values_list("receiver__email", "form_type")
+    google_forms = defaultdict(set)
+    for item in google_forms_list:
+        google_forms[item[0]].add(item[1])
     i = 0
     items = []
     for user in users:
-        if user.email not in google_forms:
-            items.append([user.email, user.nick_name, user.full_name])
-            i += 1
+        for db_name, item_type in [("C", "client"), ("F", "full"), ("B", "basic")]:
+            if db_name not in google_forms[user.email]:
+                items.append([[user.email, user.nick_name, user.full_name], item_type])
+                i += 1
         if i > 10:
             break
     return HttpResponse(json.dumps(items), content_type="application/json")
@@ -94,7 +98,7 @@ def get_forms_for_script(request):
     if not script_id:
         return HttpResponseBadRequest("Missing scriptId")
 
-    google_forms_list = list(GoogleForm.objects.filter(active=True).filter(script_id=script_id).values_list("form_id", flat=True))
+    google_forms_list = list(GoogleForm.objects.filter(active=True).filter(script_id=script_id).exclude(form_type="C").values_list("form_id", flat=True))
     with transaction.atomic():
         unassigned_forms = GoogleForm.objects.filter(active=True).filter(script_id=None)
         for a in range(0, min(len(unassigned_forms), 19 - len(google_forms_list))):
@@ -120,6 +124,8 @@ def store_forms(request):
                 form_type = "F"
             elif form["type"] == "basic":
                 form_type = "B"
+            elif form["type"] == "client":
+                form_type = "C"
             else:
                 return HttpResponseBadRequest("Invalid form type: %s" % form["type"])
             receiver, created = User.objects.get_or_create(email=form["email"])
@@ -132,6 +138,8 @@ def store_forms(request):
                 receiver.active_full_form = form["responseUrl"]
             if form_type == "B":
                 receiver.active_basic_form = form["responseUrl"]
+            if form_type == "C":
+                receiver.active_client_form = form["responseUrl"]
             receiver.save()
 
     return HttpResponse()

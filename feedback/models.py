@@ -13,6 +13,7 @@ class User(models.Model):
 
     active_full_form = models.URLField(null=True, blank=True)
     active_basic_form = models.URLField(null=True, blank=True)
+    active_client_form = models.URLField(null=True, blank=True)
 
     @property
     def nick_name(self):
@@ -50,6 +51,7 @@ class GoogleForm(models.Model):
     TYPE = (
         ("F", "Full"),
         ("B", "Basic"),
+        ("C", "Client"),
     )
     form_id = models.CharField(max_length=500, primary_key=True)
     response_url = models.URLField(null=True)

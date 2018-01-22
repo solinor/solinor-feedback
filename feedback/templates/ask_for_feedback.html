@@ -22,12 +22,24 @@ $(function () {
 </script>
 {% endblock %}
 {% block content %}
-<h1>I want feedback from ...</h1>
 
+<h1>I want feedback from...</h1>
+
+<p>Current list of people who will give feedback to me:</p>
 <p style="max-width: 30em">
 {% for user in users %}
+{% if user.fb_request %}
 <button type="button" class="btn {% if user.fb_request %}btn-disabled btn-success{% else %}btn-default request-feedback{% endif %} btn-lg btn-block" {% if user.fb_request %} disabled="disabled"{% endif %} data-email="{{ user.email }}">{{ user.full_name }} <span class="spinner-holder"></span></button>
+{% endif %}
+{% endfor %}
+</p>
 
+<p>I want feedback from...</p>
+<p style="max-width: 30em">
+{% for user in users %}
+{% if not user.fb_request %}
+<button type="button" class="btn {% if user.fb_request %}btn-disabled btn-success{% else %}btn-default request-feedback{% endif %} btn-lg btn-block" {% if user.fb_request %} disabled="disabled"{% endif %} data-email="{{ user.email }}">{{ user.full_name }} <span class="spinner-holder"></span></button>
+{% endif %}
 {% endfor %}
 </p>
 {% endblock %}

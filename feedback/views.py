@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Count
 
 from feedback.models import *
 
@@ -40,8 +41,13 @@ forms_schema = schema.Schema({
 @login_required
 def frontpage(request):
     user, _ = User.objects.get_or_create(email=request.user.email)
-    requests = list(FeedbackRequest.objects.filter(giver=user).filter(active_response=None).select_related("giver", "receiver", "requested_by"))
-    random.shuffle(requests)
+    all_requests = {req.receiver.email: req for req in FeedbackRequest.objects.filter(giver=user).filter(active_response=None).select_related("giver", "receiver", "requested_by")}
+    receiver_requests = FeedbackRequest.objects.filter(receiver__in=[req.receiver for req in all_requests.values()]).values("receiver__email").order_by("receiver__email").annotate(requests=Count('receiver')).order_by("requests")
+
+    requests = []
+    for item in receiver_requests:
+        requests.append(all_requests[item["receiver__email"]])
+
     feedback_given = ResponseSet.objects.filter(giver=user).filter(active=True).select_related("giver", "receiver")
     existing_users = {k.receiver.email for k in requests}
     existing_users.update({k.receiver.email for k in feedback_given})

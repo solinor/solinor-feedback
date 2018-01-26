@@ -16,6 +16,9 @@
 <h1>Feedback requests</h1>
 
 {% if requests %}
+
+<p>This is an ordered list. When possible, start giving feedback from the top of the list. After you have given a feedback to someone, that person moves to "Feedback you have sent" list (or that should happen. If Google Form says you have already answered, your feedback will get to the recipient). This page does not refresh automatically.</p>
+
 <ul>
   {% for feedback_request in requests %}
     <li><a target="_blank" href="{{ feedback_request.receiver.active_full_form }}">{{ feedback_request.receiver.full_name }}</a></li>

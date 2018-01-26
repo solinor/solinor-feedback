@@ -1,17 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 
+{% if requests %}
+
 <div class="jumbotron">
 <h1>Get started</h1>
 
 <p>
-<a href="{% url "ask_for_feedback" %}" class="btn btn-primary btn-lg">Ask for feedback</a>
-
-{% if requests %}
+  {% comment %}
+    <a href="{% url "ask_for_feedback" %}" class="btn btn-primary btn-lg">Ask for feedback</a>
+    {% endcomment %}
 <a target="_blank" href="{{ requests.0.receiver.active_full_form }}" class="btn btn-primary btn-lg">Give feedback to {{ requests.0.receiver.full_name }}</a>
-{% endif %}
 </p>
 </div>
+{% endif %}
 
 <h1>Feedback requests</h1>
 
@@ -40,10 +42,10 @@
 <p>You haven't given any feedback yet.</p>
 {% endif %}
 
-{% comment %}
 <h1>Everyone else</h1>
 
 {% if all_forms %}
+<p>You can write feedback to anyone else as well. After finishing "Feedback requests" section above, pick people you know anything to say. You don't have to answer all questions.</p>
 
 <ul>
   {% for form in all_forms %}
@@ -54,5 +56,4 @@
 {% else %}
 <p>It seems there is no-one to show on this list: everyone on the system are already in your feedback requests and/or "you have already given feedback" lists.</p>
 {% endif %}
-{% endcomment %}
 {% endblock %}

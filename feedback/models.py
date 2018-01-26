@@ -31,6 +31,9 @@ class User(models.Model):
     def __str__(self):
         return self.email
 
+    class Meta:
+        ordering = ("email",)
+
 
 class FeedbackRequest(models.Model):
     receiver = models.ForeignKey("User", on_delete=models.CASCADE, related_name="feedback_receiver")

@@ -5,6 +5,7 @@ This is a simple tool to facilitate feedback between colleagues. This is not mea
 - This is a quick one-off solution, not a finished or polished product.
 - Forms are outsourced to Google Forms. Some values are hardcoded on the code, such as "the first question is whether feedback is anonymous or not". See `views.py:record_response` method for more details.
 
+Master branch of [this repository](https://github.com/solinor/solinor-feedback) is automatically deployed to Solinor's internal service.
 
 ## Process for giving and receiving the feedback
 

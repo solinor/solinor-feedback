@@ -218,15 +218,15 @@ def admin_book_feedback(request):
         if email == request.user.email:
             return HttpResponseForbidden("You can't see your own feedback")
         user = User.objects.get(email=email)
-        if user.feedback_admin == None:
+        if user.feedback_admin:
+            messages.add_message(request, messages.WARNING, "%s has already been booked by %s" % (email, user.feedback_admin))
+        else:
             user.feedback_admin = admin_user
             user.save()
             messages.add_message(request, messages.INFO, "You booked %s" % email)
-        else:
-            messages.add_message(request, messages.WARNING, "%s has already been booked by %s" % (email, user.feedback_admin))
         return HttpResponseRedirect(reverse("admin_book_feedback"))
 
-    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).values("receiver__activated").annotate(c=Count("receiver__activated")).values_list("email", "receiver__activated",  "c")
+    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).values("receiver__activated").annotate(c=Count("receiver__activated")).values_list("email", "receiver__activated", "c")
     non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email)
     return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
 

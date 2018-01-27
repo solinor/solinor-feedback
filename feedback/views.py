@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -226,8 +226,9 @@ def admin_book_feedback(request):
             messages.add_message(request, messages.INFO, "You booked %s" % email)
         return HttpResponseRedirect(reverse("admin_book_feedback"))
 
-    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).values("receiver__activated").annotate(c=Count("receiver__activated")).values_list("email", "receiver__activated", "c")
-    non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email)
+
+    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(activated=Count("receiver__activated", filter=Q(receiver__activated=True))).annotate(not_activated=Count("receiver__activated", filter=Q(receiver__activated=False)))
+    non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))
     return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
 
 

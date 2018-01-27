@@ -9,7 +9,7 @@ from feedback.models import FeedbackRequest, User
 
 
 class Command(BaseCommand):
-    help = 'Get list of users with no feedback requests'
+    help = 'List of users with number of feedback requests they made'
 
     def add_arguments(self, parser):
         parser.add_argument(

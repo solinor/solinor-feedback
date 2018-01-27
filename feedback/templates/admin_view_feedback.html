@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block header %}
+<script>
+$(function () {
+  $(".non-public-name").each(function() {
+    $(this).click(function () {
+      $(this).html("Anonymous colleague: " + $(this).data("name"));
+    })
+  });
+});
+</script>
+{% endblock %}
+{% block content %}
+
+{% include "snippets/feedback_view.html" %}
+
+<hr/>
+<div>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="release-feedback" value="true">
+  <input type="submit" class="btn btn-lg btn-info" value="Release feedback to {{ user.nick_name }}">
+</form>
+</div>
+
+{% endblock %}

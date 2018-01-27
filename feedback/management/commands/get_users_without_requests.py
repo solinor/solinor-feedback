@@ -2,9 +2,10 @@ import json
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db.models import Avg, Case, Count, Exists, F, Max, Min, OuterRef, Prefetch, Q, Subquery, Sum, When
 from django.utils import timezone
+
 from feedback.models import FeedbackRequest, User
-from django.db.models import Avg, Case, Count, F, Max, Min, Prefetch, Q, Sum, When, Exists, OuterRef, Subquery
 
 
 class Command(BaseCommand):

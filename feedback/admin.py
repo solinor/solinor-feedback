@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from feedback.models import User, FeedbackRequest
+from feedback.models import FeedbackRequest, User
 
 
 class UserAdmin(admin.ModelAdmin):

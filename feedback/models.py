@@ -15,6 +15,8 @@ class User(models.Model):
     active_basic_form = models.URLField(null=True, blank=True)
     active_client_form = models.URLField(null=True, blank=True)
 
+    feedback_admin = models.ForeignKey("User", null=True, on_delete=models.CASCADE)
+
     @property
     def nick_name(self):
         if self.unique_first_name:
@@ -77,7 +79,7 @@ class Question(models.Model):
 class Answer(models.Model):
     response = models.TextField()
     question = models.ForeignKey("Question", on_delete=models.CASCADE)
-    responses = models.ForeignKey("ResponseSet", models.CASCADE)
+    responses = models.ForeignKey("ResponseSet", on_delete=models.CASCADE)
 
 
 class ResponseSet(models.Model):
@@ -96,3 +98,8 @@ class ResponseSet(models.Model):
 
     def __str__(self):
         return "Response from %s to %s (active: %s)" % (self.giver, self.receiver, self.active)
+
+    class Meta:
+        permissions = (
+            ("can_share_feedback", "Can admin feedback responses"),
+        )

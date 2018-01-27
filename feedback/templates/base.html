@@ -14,6 +14,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
 
+    <style>
+    .blockquote-new {
+      border-left-color: #efb5b5;
+    }
+    </style>
+
     {% block header %}{% endblock %}
 </head>
 
@@ -33,6 +39,10 @@
         <ul class="nav navbar-nav">
           <li><a href="{% url "frontpage" %}">Home</a></li>
           {% comment %}<li><a href="{% url "ask_for_feedback" %}">Ask for feedback</a></li>{% endcomment %}
+          {% if perms.feedback.can_share_feedback %}
+          <li><a href="{% url "admin_book_feedback" %}">Book a feedback session</a></li>
+          {% endif %}
+          <li><a href="{% url "user_view_feedback" %}">Your feedback</a></li>
           {% block navbar_items %}{% endblock %}
         </ul>
         {% if request.user.is_staff %}

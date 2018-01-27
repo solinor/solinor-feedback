@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Your users</h1>
+
+<ul>
+  {% for user in you_give_feedback_to %}
+  <li><a href="{% url "admin_view_feedback" user.email %}">{{ user }}</a></li>
+  {% endfor %}
+</ul>
+
+<h1>Non-assigned users</h1>
+
+<ul>
+  {% for user in non_assigned_users %}
+  <li>{{ user }} <form method="post" class="form-inline">
+  {% csrf_token %}
+  <input type="hidden" name="email" value="{{ user.email }}">
+  <button role="submit" class="btn-link btn btn-info">Book</button>
+</form></li>
+  {% endfor %}
+</ul>
+{% endblock %}

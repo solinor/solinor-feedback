@@ -1,0 +1,46 @@
+<h2>Does {{ user.nick_name }} get stuff done?</h2>
+
+<ul>
+  <li>{{ stats.gets_stuff_done.0 }} - No :(</li>
+  <li>{{ stats.gets_stuff_done.1 }}</li>
+  <li>{{ stats.gets_stuff_done.2 }}</li>
+  <li>{{ stats.gets_stuff_done.3 }} - Yes, absolutely!</li>
+</ul>
+
+<h2>Is it fun to work with {{ user.nick_name }}?</h2>
+
+<ul>
+  <li>{{ stats.fun_to_work_with.0 }} - No :(</li>
+  <li>{{ stats.fun_to_work_with.1 }}</li>
+  <li>{{ stats.fun_to_work_with.2 }}</li>
+  <li>{{ stats.fun_to_work_with.3 }} - Yes, absolutely!</li>
+</ul>
+
+<h2>Do you want to work with {{ user.nick_name }}?</h2>
+
+<ul>
+<li>{{ stats.work_with.0 }} - I would prefer not to work with them</li>
+<li>{{ stats.work_with.1 }} - I don't know</li>
+<li>{{ stats.work_with.2 }} - Yes, but I would not pick them as my first choice</li>
+<li>{{ stats.work_with.3 }} - Yes, absolutely!</li>
+</ul>
+
+{% for question, answers in questions %}
+<h2>{{ question }}</h2>
+
+{% for answer in answers %}
+<blockquote style="max-width: 40em" class="{% if not answer.released %}blockquote-new{% endif %}">
+  <p>{{ answer.response }}</p>
+  {% if admin_view %}
+    <footer>{% if answer.public_giver_name %}
+        {{ answer.public_giver_name }}
+      {% else %}
+        <span class="non-public-name" data-name="{{ answer.anonymous_giver_name }}">Reveal</span>
+      {% endif %}</footer>
+  {% else %}
+    <footer>{{ answer.public_giver_name|default:"Anonymous" }}</footer>
+  {% endif %}
+</blockquote>
+{% endfor %}
+
+{% endfor %}

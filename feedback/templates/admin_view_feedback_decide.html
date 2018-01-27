@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post">
+  {% csrf_token %}
+  <input type="submit" name="with_user" class="btn btn-primary btn-lg" value="Go through the feedback with {{ user.nick_name }}">
+  <input type="submit" name="admin_view" class="btn btn-danger btn-lg" value="Go to admin view">
+</form>
+
+{% endblock %}

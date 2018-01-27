@@ -4,12 +4,14 @@ from collections import defaultdict
 
 import schema
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
 from django.db.models import Count
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from feedback.models import *
 
@@ -149,6 +151,84 @@ def store_forms(request):
             receiver.save()
 
     return HttpResponse()
+
+
+def get_answers(active_responses, admin_view=False):
+    questions = defaultdict(list)
+    stats = {
+        "fun_to_work_with": [0, 0, 0, 0],
+        "gets_stuff_done": [0, 0, 0, 0],
+        "work_with": [0, 0, 0, 0],
+    }
+    work_with_mapping = {k: i for i, k in enumerate(("I would prefer not to work with them", "I don't know", "Yes, but I would not pick them as my first choice", "Yes, absolutely!"))}
+    for response in active_responses:
+        stats["fun_to_work_with"][response.fun_to_work_with - 1] += 1
+        stats["gets_stuff_done"][response.gets_stuff_done - 1] += 1
+        stats["work_with"][work_with_mapping[response.work_with]] += 1
+        for answer in response.answer_set.all():
+            if response.activated:
+                answer.released = True
+            if response.anonymous:
+                if admin_view:
+                    answer.anonymous_giver_name = response.giver.nick_name
+            else:
+                answer.public_giver_name = response.giver.nick_name
+
+            questions[answer.question.question].append(answer)
+    questions = list(dict(questions).items())
+    questions.reverse()
+    return questions, stats
+
+
+@login_required
+def user_view_feedback(request):
+    user, _ = User.objects.get_or_create(email=request.user.email)
+    active_responses = ResponseSet.objects.filter(receiver=user).filter(active=True).filter(activated=True)
+    questions, stats = get_answers(active_responses)
+    unreleased_feedback = ResponseSet.objects.filter(receiver=user).filter(active=True).filter(activated=False).count()
+    return render(request, "user_view_feedback.html", {"questions": questions, "stats": stats, "unreleased_feedback": unreleased_feedback})
+
+
+@login_required
+@permission_required("feedback.can_share_feedback")
+def admin_view_feedback(request, user_email):
+    user = User.objects.get(email=user_email)
+    admin_user = User.objects.get(email=request.user.email)
+    if user.feedback_admin != admin_user:
+        return HttpResponseForbidden("%s is not assigned for you." % user_email)
+
+    if request.method == "POST":
+        if request.POST.get("release-feedback"):
+            ResponseSet.objects.filter(receiver_user).filter(active=True).update(activated=True)
+            messages.add_message(request, messages.INFO, "Feedback released")
+        active_responses = ResponseSet.objects.filter(receiver=user).filter(active=True).select_related("giver").prefetch_related("answer_set")
+        admin_view = request.POST.get("admin_view")
+        questions, stats = get_answers(active_responses, admin_view)
+        return render(request, "admin_view_feedback.html", {"questions": questions, "admin_view": admin_view, "user": user, "stats": stats})
+
+    return render(request, "admin_view_feedback_decide.html", {"user": user})
+
+
+@login_required
+@permission_required("feedback.can_share_feedback")
+def admin_book_feedback(request):
+    admin_user, _ = User.objects.get_or_create(email=request.user.email)
+    if request.method == "POST":
+        email = request.POST.get("email")
+        if email == request.user.email:
+            return HttpResponseForbidden("You can't see your own feedback")
+        user = User.objects.get(email=email)
+        if user.feedback_admin == None:
+            user.feedback_admin = admin_user
+            user.save()
+            messages.add_message(request, messages.INFO, "You booked %s" % email)
+        else:
+            messages.add_message(request, messages.WARNING, "%s has already been booked by %s" % (email, user.feedback_admin))
+        return HttpResponseRedirect(reverse("admin_book_feedback"))
+
+    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True)
+    non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email)
+    return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
 
 
 @csrf_exempt

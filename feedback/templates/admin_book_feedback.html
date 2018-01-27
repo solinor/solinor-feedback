@@ -4,8 +4,8 @@
 <h1>Your users</h1>
 
 <ul>
-  {% for user in you_give_feedback_to %}
-  <li><a href="{% url "admin_view_feedback" user.email %}">{{ user }}</a></li>
+  {% for email, released, count in you_give_feedback_to %}
+  <li><a href="{% url "admin_view_feedback" email %}">{{ email }} - {% if released %}{{ count }} published feedbacks{% else %}{{ count}} unprocessed feedbacks{% endif %}</a></li>
   {% endfor %}
 </ul>
 

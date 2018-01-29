@@ -1,7 +1,7 @@
 import requests
 from django.conf import settings
-from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.models import Group, User
 
 IS_STAFF = getattr(settings, 'GOOGLEAUTH_IS_STAFF', False)
 GROUPS = getattr(settings, 'GOOGLEAUTH_GROUPS', tuple())

@@ -2,7 +2,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend
- 
+
 IS_STAFF = getattr(settings, 'GOOGLEAUTH_IS_STAFF', False)
 GROUPS = getattr(settings, 'GOOGLEAUTH_GROUPS', tuple())
 APPS_DOMAIN = getattr(settings, 'GOOGLEAUTH_APPS_DOMAIN', None)
@@ -40,7 +40,7 @@ class GoogleAuthBackend(ModelBackend):
                 try:
                     grp = Group.objects.get(name=group)
                     user.groups.add(grp)
-                except:
+                except Group.DoesNotExist:
                     pass
 
             user.save()

@@ -108,7 +108,7 @@ GOOGLEAUTH_IS_STAFF = False
 GOOGLEAUTH_GROUPS = []
 
 AUTHENTICATION_BACKENDS = (
-    'googleauth.backends.GoogleAuthBackend',
+    'improve_stuff.custom_google_auth_backend.GoogleAuthBackend',
 )
 
 ROOT_URLCONF = 'improve_stuff.urls'

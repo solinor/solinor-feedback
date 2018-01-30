@@ -226,7 +226,7 @@ def admin_book_feedback(request):
             messages.add_message(request, messages.INFO, "You booked %s" % email)
         return HttpResponseRedirect(reverse("admin_book_feedback"))
 
-    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(activated=Count("receiver__activated", filter=Q(receiver__activated=True))).annotate(not_activated=Count("receiver__activated", filter=Q(receiver__activated=False)))
+    you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(activated=Count("receiver__activated", filter=Q(receiver__activated=True) & Q(receiver__active=True))).annotate(not_activated=Count("receiver__activated", filter=Q(receiver__activated=False) & Q(receiver__active=True)))
     non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))
     return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
 

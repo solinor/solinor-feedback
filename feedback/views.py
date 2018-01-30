@@ -199,7 +199,7 @@ def admin_view_feedback(request, user_email):
 
     if request.method == "POST":
         if request.POST.get("release-feedback"):
-            ResponseSet.objects.filter(receiver_user).filter(active=True).update(activated=True)
+            ResponseSet.objects.filter(receiver=user).filter(active=True).update(activated=True)
             messages.add_message(request, messages.INFO, "Feedback released")
         active_responses = ResponseSet.objects.filter(receiver=user).filter(active=True).select_related("giver").prefetch_related("answer_set")
         admin_view = request.POST.get("admin_view")

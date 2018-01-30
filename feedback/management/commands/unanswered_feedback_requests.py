@@ -10,6 +10,7 @@ from feedback.models import FeedbackRequest, User
 
 class Command(BaseCommand):
     help = 'Get users along with unanswered feedback requests'
+
     def add_arguments(self, parser):
         parser.add_argument(
             "--filter",
@@ -17,7 +18,6 @@ class Command(BaseCommand):
             dest="filter",
             help="Filter by emails",
         )
-
 
     def handle(self, *args, **options):
         for user in User.objects.filter(active=True).prefetch_related("feedback_receiver", "feedback_receiver__giver"):

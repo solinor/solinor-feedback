@@ -1,3 +1,25 @@
+<div class="feedback">
+{% for question, answers in questions %}
+<h2>{{ question }}</h2>
+
+{% for answer in answers %}
+<blockquote style="max-width: 40em" class="{% if not answer.released %}blockquote-new{% endif %}">
+  <p>{{ answer.response }}</p>
+  {% if admin_view %}
+    <footer>{% if answer.public_giver_name %}
+        {{ answer.public_giver_name }}
+      {% else %}
+        <span class="non-public-name" data-name="{{ answer.anonymous_giver_name }}">Reveal</span>
+      {% endif %}</footer>
+  {% else %}
+    <footer>{{ answer.public_giver_name|default:"Anonymous" }}</footer>
+  {% endif %}
+</blockquote>
+{% endfor %}
+
+{% endfor %}
+
+
 <h2>Does {{ user.nick_name }} get stuff done?</h2>
 
 <ul>
@@ -24,23 +46,4 @@
 <li>{{ stats.work_with.2 }} - Yes, but I would not pick them as my first choice</li>
 <li>{{ stats.work_with.3 }} - Yes, absolutely!</li>
 </ul>
-
-{% for question, answers in questions %}
-<h2>{{ question }}</h2>
-
-{% for answer in answers %}
-<blockquote style="max-width: 40em" class="{% if not answer.released %}blockquote-new{% endif %}">
-  <p>{{ answer.response }}</p>
-  {% if admin_view %}
-    <footer>{% if answer.public_giver_name %}
-        {{ answer.public_giver_name }}
-      {% else %}
-        <span class="non-public-name" data-name="{{ answer.anonymous_giver_name }}">Reveal</span>
-      {% endif %}</footer>
-  {% else %}
-    <footer>{{ answer.public_giver_name|default:"Anonymous" }}</footer>
-  {% endif %}
-</blockquote>
-{% endfor %}
-
-{% endfor %}
+</div>

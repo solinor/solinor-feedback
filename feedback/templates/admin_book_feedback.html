@@ -5,7 +5,7 @@
 
 <ul>
   {% for user in you_give_feedback_to %}
-  <li><a href="{% url "admin_view_feedback" user.email %}">{{ user.email }} - {{ user.activated }} processed, {{ user.not_activated}} pending</a></li>
+  <li><a href="{% url "admin_view_feedback" user.email %}">{{ user.email }}</a> - {{ user.activated }} processed, {{ user.not_activated}} pending - <a href="{% url "admin_unfilled_requests" user.email %}">{{ user.pending_requests }} requests not fulfilled</a></li>
   {% endfor %}
 </ul>
 

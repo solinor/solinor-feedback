@@ -18,6 +18,7 @@ urlpatterns = [
     path('get_script_triggers', feedback.views.get_forms_for_script),
     path('admin_book_feedback', feedback.views.admin_book_feedback, name="admin_book_feedback"),
     path('admin_view_feedback/<user_email>', feedback.views.admin_view_feedback, name="admin_view_feedback"),
+    path('admin_unfilled_requests/<user_email>', feedback.views.admin_unfilled_requests, name="admin_unfilled_requests"),
     path('user_view_feedback', feedback.views.user_view_feedback, name="user_view_feedback"),
     url(r'^accounts/', include('googleauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(pattern_name='frontpage', permanent=False)),

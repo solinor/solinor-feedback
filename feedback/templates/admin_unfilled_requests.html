@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Not fulfilled feedback requests for {{ user.nick_name }}</h1>
+
+<p>Shareable direct URL to form:</p>
+
+<p><code><a href="{{ user.active_full_form }}">{{ user.active_full_form }}</a></code></p>
+
+<ul>
+  {% for req in pending_requests %}
+  <li>{{ req.giver }}</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

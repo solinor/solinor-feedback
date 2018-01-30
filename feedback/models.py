@@ -26,7 +26,7 @@ class User(models.Model):
     @property
     def full_name(self):
         if self.first_name:
-            return "%s %s" % (self.first_name, self.last_name)
+            return "{} {}".format(self.first_name, self.last_name)
         else:
             return self.email
 
@@ -49,7 +49,7 @@ class FeedbackRequest(models.Model):
 
     def __str__(self):
         answered = self.active_response is not None
-        return "Request by %s for %s; answered: %s" % (self.receiver, self.giver, answered)
+        return "Request by {} for {}; answered: {}".format(self.receiver, self.giver, answered)
 
 
 class GoogleForm(models.Model):
@@ -97,7 +97,7 @@ class ResponseSet(models.Model):
     work_with = models.CharField(max_length=200)
 
     def __str__(self):
-        return "Response from %s to %s (active: %s)" % (self.giver, self.receiver, self.active)
+        return "Response from {} to {} (active: {})".format(self.giver, self.receiver, self.active)
 
     class Meta:
         permissions = (

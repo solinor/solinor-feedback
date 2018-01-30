@@ -135,7 +135,7 @@ def store_forms(request):
             elif form["type"] == "client":
                 form_type = "C"
             else:
-                return HttpResponseBadRequest("Invalid form type: %s" % form["type"])
+                return HttpResponseBadRequest("Invalid form type: {}".format(form["type"]))
             receiver, created = User.objects.get_or_create(email=form["email"])
             if created:
                 receiver.save()
@@ -195,7 +195,7 @@ def admin_view_feedback(request, user_email):
     user = User.objects.get(email=user_email)
     admin_user = User.objects.get(email=request.user.email)
     if user.feedback_admin != admin_user:
-        return HttpResponseForbidden("%s is not assigned for you." % user_email)
+        return HttpResponseForbidden("{} is not assigned for you.".format(user_email))
 
     if request.method == "POST":
         if request.POST.get("release-feedback"):
@@ -219,16 +219,30 @@ def admin_book_feedback(request):
             return HttpResponseForbidden("You can't see your own feedback")
         user = User.objects.get(email=email)
         if user.feedback_admin:
-            messages.add_message(request, messages.WARNING, "%s has already been booked by %s" % (email, user.feedback_admin))
+            messages.add_message(request, messages.WARNING, "{} has already been booked by {}".format(email, user.feedback_admin))
         else:
             user.feedback_admin = admin_user
             user.save()
-            messages.add_message(request, messages.INFO, "You booked %s" % email)
+            messages.add_message(request, messages.INFO, "You booked {}".format(email))
         return HttpResponseRedirect(reverse("admin_book_feedback"))
 
     you_give_feedback_to = User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(activated=Count("receiver__activated", filter=Q(receiver__activated=True) & Q(receiver__active=True))).annotate(not_activated=Count("receiver__activated", filter=Q(receiver__activated=False) & Q(receiver__active=True)))
+    pending_requests = {u.email: u.pending_requests for u in User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))}
+    for u in you_give_feedback_to:
+        u.pending_requests = pending_requests.get(u.email)
     non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))
     return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
+
+
+@login_required
+@permission_required("feedback.can_share_feedback")
+def admin_unfilled_requests(request, user_email):
+    user = User.objects.get(email=user_email)
+    admin_user = User.objects.get(email=request.user.email)
+    if user.feedback_admin != admin_user:
+        return HttpResponseForbidden("{} is not assigned to you.".format(user))
+    pending_requests = FeedbackRequest.objects.filter(receiver=user).filter(active_response=None).select_related("giver")
+    return render(request, "admin_unfilled_requests.html", {"pending_requests": pending_requests, "user": user})
 
 
 @csrf_exempt

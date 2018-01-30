@@ -186,7 +186,11 @@ def user_view_feedback(request):
     active_responses = ResponseSet.objects.filter(receiver=user).filter(active=True).filter(activated=True)
     questions, stats = get_answers(active_responses)
     unreleased_feedback = ResponseSet.objects.filter(receiver=user).filter(active=True).filter(activated=False).count()
-    return render(request, "user_view_feedback.html", {"questions": questions, "stats": stats, "unreleased_feedback": unreleased_feedback})
+    if user.feedback_admin:
+        feedback_form = user.feedback_admin.admin_feedback_form
+    else:
+        feedback_form = None
+    return render(request, "user_view_feedback.html", {"feedback_form": feedback_form, "questions": questions, "stats": stats, "unreleased_feedback": unreleased_feedback})
 
 
 @login_required

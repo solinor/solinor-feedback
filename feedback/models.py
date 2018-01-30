@@ -16,6 +16,7 @@ class User(models.Model):
     active_client_form = models.URLField(null=True, blank=True)
 
     feedback_admin = models.ForeignKey("User", null=True, on_delete=models.CASCADE)
+    admin_feedback_form = models.URLField(null=True, blank=True)
 
     @property
     def nick_name(self):

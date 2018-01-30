@@ -9,10 +9,17 @@
 </ul>
 
 {% if questions %}
+
+{% if feedback_form %}
+<div class="alert alert-info" role="alert">
+  Please <a target="_blank" class="alert-link" href="{{ feedback_form }}">give feedback</a> about this process.
+</div>
+{% endif %}
+
 {% include "snippets/feedback_view.html" %}
 {% else %}
 {% if unreleased_feedback > 0 %}
-<p>You don't have any feedback available for you right now. There is {{ unreleased_feedback }} unreleased feedback for you. This page will show your feedback after you have had 1-on-1 meeting to discuss the feedback you received.</p>
+<p>You don't have any feedback available for you right now. There is {{ unreleased_feedback }} unreleased feedback for you. That will be available for you after you have had 1-on-1 meeting.</p>
 {% else %}
 <p>You don't have any pending or released feedback.</p>
 {% endif %}

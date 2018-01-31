@@ -13,7 +13,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'sr_hxcfy32#fmut4x#x#8&(dc1ipqqq-gl-kww7lrmckztw8nc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", True) in (True, "true", "True", "1")
+DEBUG = os.environ.get("DEBUG", False) in (True, "true", "True", "1")
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", True) in (True, "True", "true")

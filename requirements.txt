@@ -1,7 +1,9 @@
 dj-database-url==0.4.2
+django-compressor==2.2
 django-extensions==1.9.9
+django-googleauth-ng==2.3
+django-reversion==2.0.12
 Django==2.0
-git+git://github.com/ojarva/django-googleauth.git@42f9cd8d3a5aee5b032d536ed213fcc0f72fb49a
 gunicorn==19.7.1
 psycopg2==2.7.3.2
 pytz==2017.3

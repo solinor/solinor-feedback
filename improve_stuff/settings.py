@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'googleauth',
     'feedback',
+    "compressor",
 ]
 if DEBUG:
     INSTALLED_APPS += ('debug_toolbar',)
@@ -189,6 +190,7 @@ STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    "compressor.finders.CompressorFinder",
 )
 
 # Extra places for collectstatic to find static files.

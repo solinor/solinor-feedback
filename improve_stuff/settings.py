@@ -85,19 +85,19 @@ if DEBUG:
     INTERNAL_IPS = ("127.0.0.1",)
 
 # client ID from the Google Developer Console
-GOOGLEAUTH_CLIENT_ID = os.environ["GOOGLEAUTH_CLIENT_ID"]
+GOOGLEAUTH_CLIENT_ID = os.environ.get("GOOGLEAUTH_CLIENT_ID")
 
 # client secret from the Google Developer Console
-GOOGLEAUTH_CLIENT_SECRET = os.environ["GOOGLEAUTH_CLIENT_SECRET"]
+GOOGLEAUTH_CLIENT_SECRET = os.environ.get("GOOGLEAUTH_CLIENT_SECRET")
 
 # your app's domain, used to construct callback URLs
-GOOGLEAUTH_CALLBACK_DOMAIN = os.environ["GOOGLEAUTH_CALLBACK_DOMAIN"]
+GOOGLEAUTH_CALLBACK_DOMAIN = os.environ.get("GOOGLEAUTH_CALLBACK_DOMAIN")
 
 # callback URL uses HTTPS (your side, not Google), default True
 GOOGLEAUTH_USE_HTTPS = os.environ.get("GOOGLEAUTH_USE_HTTPS", True) in (True, "True", "true")
 
 # restrict to the given Google Apps domain, default None
-GOOGLEAUTH_APPS_DOMAIN = os.environ["GOOGLEAUTH_APPS_DOMAIN"]
+GOOGLEAUTH_APPS_DOMAIN = os.environ.get("GOOGLEAUTH_APPS_DOMAIN")
 
 # get user's name, default True (extra HTTP request)
 GOOGLEAUTH_GET_PROFILE = True

@@ -103,4 +103,5 @@ class ResponseSet(models.Model):
     class Meta:
         permissions = (
             ("can_share_feedback", "Can admin feedback responses"),
+            ("can_see_all_feedback", "Can see all feedback"),
         )

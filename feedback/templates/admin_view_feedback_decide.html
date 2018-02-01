@@ -4,8 +4,12 @@
 
 <form method="post">
   {% csrf_token %}
+  {% if is_feedback_admin %}
   <input type="submit" name="with_user" class="btn btn-primary btn-lg" value="Go through the feedback with {{ user.nick_name }}">
   <input type="submit" name="admin_view" class="btn btn-danger btn-lg" value="Go to admin view">
+  {% else %}
+  <input type="submit" name="with_user" class="btn btn-primary btn-lg" value="See what feedback {{ user.nick_name }} received">
+  {% endif %}
 </form>
 
 {% endblock %}

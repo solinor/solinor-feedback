@@ -199,20 +199,20 @@ def admin_view_feedback(request, user_email):
     user = User.objects.get(email=user_email)
     admin_user = User.objects.get(email=request.user.email)
     can_see_all_feedback = request.user.has_perm("feedback.can_see_all_feedback")
-    is_admin_user = user.feedback_admin == admin_user
-    if not is_admin_user and not can_see_all_feedback:
+    is_feedback_admin = user.feedback_admin == admin_user
+    if not is_feedback_admin and not can_see_all_feedback:
         return HttpResponseForbidden("{} is not assigned for you.".format(user_email))
 
     if request.method == "POST":
-        if request.POST.get("release-feedback") and is_admin_user:
+        if request.POST.get("release-feedback") and is_feedback_admin:
             ResponseSet.objects.filter(receiver=user).filter(active=True).update(activated=True)
             messages.add_message(request, messages.INFO, "Feedback released")
         active_responses = ResponseSet.objects.filter(receiver=user).filter(active=True).select_related("giver").prefetch_related("answer_set")
-        admin_view = request.POST.get("admin_view") and is_admin_user
+        admin_view = request.POST.get("admin_view") and is_feedback_admin
         questions, stats = get_answers(active_responses, admin_view)
         return render(request, "admin_view_feedback.html", {"questions": questions, "admin_view": admin_view, "user": user, "stats": stats})
 
-    return render(request, "admin_view_feedback_decide.html", {"user": user, "is_admin_user": is_admin_user})
+    return render(request, "admin_view_feedback_decide.html", {"user": user, "is_feedback_admin": is_feedback_admin})
 
 
 @login_required

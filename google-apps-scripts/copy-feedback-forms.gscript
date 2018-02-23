@@ -1,0 +1,91 @@
+var sharedSecret = "generate-random-value-here"; // Generate UUID or similar random value, and set it to RESPONSE_SHARED_SECRET variable in Heroku.
+var domain = "https://your-app-name-here-18631A356B22.herokuapp.com/";
+
+function copyForms() {
+  var formWithRequestId = "form-id"; // For this and next three fields, set placeholder form IDs, such sa 2GLAbcDEfGHtXx5ZqiAa-GZWjmgediMt92-bcdefabCd
+  var formWithoutRequestId = "form-id";
+  var clientFeedbackFormId = "form-id";
+  var folderId = "set-form-folder-id-here"; // for example, 2UK1lq8L0-aFbcDEfgHiJP7Uig0Vh3EmA
+
+  var response = UrlFetchApp.fetch(domain + 'get_missing_forms?sharedSecret=' + sharedSecret);
+  var listOfPeople = JSON.parse(response.getContentText());
+
+  var formWithRequestFile = DriveApp.getFileById(formWithRequestId);
+  var formWithoutRequestFile = DriveApp.getFileById(formWithoutRequestId);
+  var clientFeedbackFile = DriveApp.getFileById(clientFeedbackFormId);
+  var folder = DriveApp.getFolderById(folderId);
+  var forms = []
+  var postData = {
+    "sharedSecret": sharedSecret
+  }
+  for (var personId in listOfPeople) {
+    var details = listOfPeople[personId];
+    var person = details[0];
+    var formType = details[1];
+
+    if (formType == "full") {
+      var fileCopy = formWithRequestFile.makeCopy(folder);
+      fileCopy.setName("Peer feedback (from feedback request) for " + person[2]);
+      var form = FormApp.openById(fileCopy.getId());
+      form.setTitle("Peer feedback for " + person[2]);
+      var items = form.getItems();
+      for (var key in items) {
+        items[key].setTitle(items[key].getTitle().replace("<name>", person[1]));
+        items[key].setHelpText(items[key].getHelpText().replace("<name>", person[1]));
+      }
+      forms.push({
+        "id": form.getId(),
+        "responseUrl": form.getPublishedUrl(),
+        "email": person[0],
+        "type": "full"
+      });
+    }
+    if (formType == "basic") {
+      var fileCopy = formWithoutRequestFile.makeCopy(folder);
+      fileCopy.setName("Peer feedback (without feedback request) for " + person[2]);
+      var form = FormApp.openById(fileCopy.getId());
+      form.setTitle("Peer feedback for " + person[2]);
+      var items = form.getItems();
+      for (var key in items) {
+        items[key].setTitle(items[key].getTitle().replace("<name>", person[1]));
+        items[key].setHelpText(items[key].getHelpText().replace("<name>", person[1]));
+      }
+      forms.push({
+        "id": form.getId(),
+        "responseUrl": form.getPublishedUrl(),
+        "email": person[0],
+        "type": "basic"
+      });
+    }
+    if (formType == "client") {
+      var fileCopy = clientFeedbackFile.makeCopy(folder);
+      fileCopy.setName("Peer feedback (client) for " + person[2]);
+      var form = FormApp.openById(fileCopy.getId());
+      form.setTitle("Feedback for " + person[2] + "(in English tai suomeksi)");
+      var items = form.getItems();
+      for (var key in items) {
+        items[key].setTitle(items[key].getTitle().replace("<name>", person[1]));
+        items[key].setHelpText(items[key].getHelpText().replace("<name>", person[1]));
+      }
+      forms.push({
+        "id": form.getId(),
+        "responseUrl": form.getPublishedUrl(),
+        "email": person[0],
+        "type": "client"
+      });
+    }
+  }
+  postData["items"] = forms
+  Logger.log(JSON.stringify(postData));
+  url = domain + "store_forms";
+  sendToUpstream(url, postData);
+}
+
+function sendToUpstream(url, payload) {
+   var options =  {
+    "method" : "post",
+    "contentType" : "application/json",
+    "payload" : JSON.stringify(payload)
+  };
+  return UrlFetchApp.fetch(url, options)
+}

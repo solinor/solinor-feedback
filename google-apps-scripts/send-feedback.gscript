@@ -1,0 +1,80 @@
+var sharedSecret = "generate-random-value-here"; // Generate UUID or similar random value, and set it to RESPONSE_SHARED_SECRET variable in Heroku.
+var domain = "https://your-app-name-here-18631A356B22.herokuapp.com/";
+
+
+function sendFormToUpstream(event) {
+  Logger.log("Received %s", event);
+  var respondent = event.response.getRespondentEmail();
+  var formId = event.response.getEditResponseUrl();
+  Logger.log("Started processing %s submitted by %s", formId, respondent);
+  var itemResponses = event.response.getItemResponses();
+  var formResponse = {
+    "respondent": respondent,
+    "editUrl": formId,
+    "sharedSecret": sharedSecret
+  }
+  var responses = [];
+  for (var j = 0; j < itemResponses.length; j++) {
+    var itemResponse = itemResponses[j];
+    Logger.log('Response to the question "%s" was "%s"',
+               itemResponse.getItem().getTitle(),
+               itemResponse.getResponse());
+    responses.push({"question": itemResponse.getItem().getTitle(), "answer": itemResponse.getResponse()});
+  }
+  formResponse["responses"] = responses;
+
+  Logger.log("Finished processing");
+  var url = domain + "submit_response";
+
+  sendToUpstream(url, formResponse);
+}
+
+function sendToUpstream(url, payload) {
+   var options =  {
+    "method" : "post",
+    "contentType" : "application/json",
+    "payload" : JSON.stringify(payload)
+  };
+  return UrlFetchApp.fetch(url, options)
+}
+
+function attachToForms() {
+  var response = UrlFetchApp.fetch(domain + 'get_script_triggers?sharedSecret=' + sharedSecret + '&scriptId=' + ScriptApp.getScriptId());
+  var triggersForThisForm = JSON.parse(response.getContentText());
+  Logger.log("Got " + triggersForThisForm.length + " triggers for this script.");
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    var triggerBelongsToThisForm = false;
+    for (var a = 0; a < triggersForThisForm.length; a++) {
+      if (triggersForThisForm[a] == triggers[i].getTriggerSourceId()) {
+        triggerBelongsToThisForm = true;
+        break;
+      }
+    }
+    if (triggerBelongsToThisForm == false) {
+      Logger.log("Trigger for " + triggers[i].getTriggerSourceId() + " is not active for this script - delete trigger.");
+      ScriptApp.deleteTrigger(triggers[i]);
+      Utilities.sleep(1000);
+    }
+  }
+
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggersForThisForm.length; i++) {
+    var triggerAlreadyActive = false;
+    for (var a = 0; a < triggers.length; a++) {
+      if (triggers[a].getTriggerSourceId() == triggersForThisForm[i]) {
+        triggerAlreadyActive = true;
+        break;
+      }
+    }
+    if (triggerAlreadyActive == false) {
+      Logger.log("Trigger for " + triggersForThisForm[i] + " is not configured. Add a new trigger.");
+      var form = FormApp.openById(triggersForThisForm[i]);
+      ScriptApp.newTrigger('sendFormToUpstream')
+      .forForm(form)
+      .onFormSubmit()
+      .create();
+      Utilities.sleep(500);
+    }
+  }
+}

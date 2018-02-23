@@ -24,6 +24,9 @@ In case of anonymous feedback, recipient will not see the name, _but_ mentor can
 
 # Setting up
 
+![Overview](docs/feedback-app-components.png)
+
+
 ## Google Forms
 
 Create three different (or duplicate, if that is what you want) forms:

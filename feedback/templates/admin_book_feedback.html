@@ -13,10 +13,10 @@
 
 <ul>
   {% for user in non_assigned_users %}
-  <li>{{ user }} <form method="post" class="form-inline">
+  <li>{{ user }} <form method="post" class="form-inline" style="display:inline">
   {% csrf_token %}
   <input type="hidden" name="email" value="{{ user.email }}">
-  <button role="submit" class="btn-link btn btn-info">Book</button>
+  <button role="submit" class="btn-link btn">Book</button>
 </form> - {{ user.pending_requests }} requests not fulfilled.</li>
   {% endfor %}
 </ul>

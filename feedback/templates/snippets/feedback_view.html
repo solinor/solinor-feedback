@@ -3,16 +3,16 @@
 <h2>{{ question }}</h2>
 
 {% for answer in answers %}
-<blockquote style="max-width: 40em" class="{% if not answer.released %}blockquote-new{% endif %}">
-  <p>{{ answer.response }}</p>
+<blockquote style="max-width: 40em;margin-top:1em" class="blockquote {% if not answer.released %}blockquote-new{% endif %}">
+  <p class="mb-0">{{ answer.response }}</p>
   {% if admin_view %}
-    <footer>{% if answer.public_giver_name %}
+    <footer class="blockquote-footer">{% if answer.public_giver_name %}
         {{ answer.public_giver_name }}
       {% else %}
         <span class="non-public-name" data-name="{{ answer.anonymous_giver_name }}">Reveal</span>
       {% endif %}</footer>
   {% else %}
-    <footer>{{ answer.public_giver_name|default:"Anonymous" }}</footer>
+    <footer class="blockquote-footer">{{ answer.public_giver_name|default:"Anonymous" }}</footer>
   {% endif %}
 </blockquote>
 {% endfor %}

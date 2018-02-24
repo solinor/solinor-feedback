@@ -35,7 +35,7 @@
 {% if given %}
 <ul>
   {% for feedback in given %}
-  <li>{{ feedback.receiver.full_name }} <a target="_blank" href="{{ feedback.edit_response_url }}"><span class="glyphicon glyphicon-pencil"></span></a></li>
+  <li>{{ feedback.receiver.full_name }} <a target="_blank" href="{{ feedback.edit_response_url }}"><i class="fa fa-edit"></i></a></li>
   {% endfor %}
 </ul>
 {% else %}

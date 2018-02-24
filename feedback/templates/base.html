@@ -22,10 +22,16 @@
       top: 1.7em;
       background-color: white;
     }
+    #main-footer {
+      margin-top: 5em;
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+
     </style>
     {% endcompress %}
     {% compress js %}
-    <script src="{% static "js/jquery.1.12.4.min.js" %}"></script>
+    <script src="{% static "js/jquery.3.2.1.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     <script src="{% static "js/turbolinks.js" %}"></script>
     {% endcompress %}
@@ -34,53 +40,48 @@
 </head>
 
 <body>
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="{% if request.user.is_authenticated %}/{% else %}#{% endif %}">Solinor Feedback</a>
-      </div>
-      <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="{% url "frontpage" %}">Home</a></li>
-          {% comment %}<li><a href="{% url "ask_for_feedback" %}">Ask for feedback</a></li>{% endcomment %}
-          {% if perms.feedback.can_share_feedback %}
-          <li><a href="{% url "admin_book_feedback" %}">Book a feedback session</a></li>
-          {% endif %}
-          <li><a href="{% url "user_view_feedback" %}">Your feedback</a></li>
-          {% block navbar_items %}{% endblock %}
-        </ul>
-        {% if request.user.is_staff %}
-        <ul class="nav navbar-nav pull-right">
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              Profile
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              <li><a href="{% url 'admin:index' %}">Admin</a></li>
-            </ul>
-          </li>
-        </ul>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="{% if request.user.is_authenticated %}/{% else %}#{% endif %}">Solinor Feedback</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url "frontpage" %}">Home</a></li>
+        {% comment %}<li><a href="{% url "ask_for_feedback" %}">Ask for feedback</a></li>{% endcomment %}
+        {% if perms.feedback.can_share_feedback %}
+        <li class="nav-item"><a class="nav-link" href="{% url "admin_book_feedback" %}">Book a feedback session</a></li>
         {% endif %}
-      </div><!--/.nav-collapse -->
+        <li class="nav-item"><a class="nav-link" href="{% url "user_view_feedback" %}">Your feedback</a></li>
+        {% block navbar_items %}{% endblock %}
+        {% if request.user.is_staff %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+        {% endif %}
+      </ul>
     </div>
   </nav>
-  <div class="body-container">
-    <div class="container">
-      {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">{{ message }}</div>
-          {% endfor %}
-      {% endif %}
+  <main role="main">
+    <div class="body-container">
+      <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
-      {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer id="main-footer" class="text-muted">
+    <div class="container">
+      <p class="float-right">
+        <a href="#" onclick="$('html, body').animate({scrollTop:0}, 'fast'); return false;">Back to top</a>
+      </p>
+      <p>Problems? Want to improve something? <a href="https://github.com/solinor/solinor-feedback">Code available in GitHub</a>.</p>
+    </div>
+  </footer>
+
 </body>
 </html>

@@ -17,7 +17,7 @@
   {% csrf_token %}
   <input type="hidden" name="email" value="{{ user.email }}">
   <button role="submit" class="btn-link btn">Book</button>
-</form> - {{ user.pending_requests }} requests not fulfilled.</li>
+</form> - {{ user.not_activated}} pending - {{ user.pending_requests }} requests not fulfilled.</li>
   {% endfor %}
 </ul>
 {% endblock %}

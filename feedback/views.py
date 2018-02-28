@@ -236,7 +236,7 @@ def admin_book_feedback(request):
     pending_requests = {u.email: u.pending_requests for u in User.objects.filter(feedback_admin=admin_user).filter(active=True).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))}
     for u in you_give_feedback_to:
         u.pending_requests = pending_requests.get(u.email)
-    non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None))).annotate(not_activated=Count("receiver__activated", filter=Q(receiver__activated=False) & Q(receiver__active=True)))
+    non_assigned_users = User.objects.filter(feedback_admin=None).filter(active=True).exclude(email=request.user.email).annotate(pending_requests=Count("feedback_receiver", filter=Q(feedback_receiver__active_response=None)))
     return render(request, "admin_book_feedback.html", {"you_give_feedback_to": you_give_feedback_to, "non_assigned_users": non_assigned_users})
 
 
